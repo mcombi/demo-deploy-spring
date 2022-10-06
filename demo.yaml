@@ -1,0 +1,117 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    jkube.io/scm-tag: HEAD
+    jkube.io/scm-url: https://github.com/spring-projects/spring-boot/demo-deploy
+  creationTimestamp: "2022-10-06T09:00:54Z"
+  generation: 7
+  labels:
+    app: demo-deploy
+    group: com.example
+    provider: jkube
+    version: 0.0.1-SNAPSHOT
+  name: demo-deploy
+  namespace: quick-start-test
+  resourceVersion: "923172"
+  uid: 2e7c274d-57b3-4bc9-90d1-7bfc108b5623
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    app: demo-deploy
+    group: com.example
+    provider: jkube
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 3600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        jkube.io/scm-tag: HEAD
+        jkube.io/scm-url: https://github.com/spring-projects/spring-boot/demo-deploy
+      creationTimestamp: null
+      labels:
+        app: demo-deploy
+        group: com.example
+        provider: jkube
+        version: 0.0.1-SNAPSHOT
+      name: demo-deploy
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        image: image-registry.openshift-image-registry.svc:5000/quick-start-test/demo-deploy@sha256:d96fb1b2547b02aa6bea2597286420126f0febe2c493df3cdd9f20a03d40feb4
+        imagePullPolicy: IfNotPresent
+        name: spring-boot
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 9779
+          name: prometheus
+          protocol: TCP
+        - containerPort: 8778
+          name: jolokia
+          protocol: TCP
+        resources: {}
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - spring-boot
+      from:
+        kind: ImageStreamTag
+        name: demo-deploy:latest
+        namespace: quick-start-test
+    type: ImageChange
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2022-10-06T09:01:07Z"
+    lastUpdateTime: "2022-10-06T09:01:07Z"
+    message: Deployment config has minimum availability.
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2022-10-06T13:51:38Z"
+    lastUpdateTime: "2022-10-06T13:51:43Z"
+    message: replication controller "demo-deploy-3" successfully rolled out
+    reason: NewReplicationControllerAvailable
+    status: "True"
+    type: Progressing
+  details:
+    causes:
+    - imageTrigger:
+        from:
+          kind: DockerImage
+          name: image-registry.openshift-image-registry.svc:5000/quick-start-test/demo-deploy@sha256:d96fb1b2547b02aa6bea2597286420126f0febe2c493df3cdd9f20a03d40feb4
+      type: ImageChange
+    message: image change
+  latestVersion: 3
+  observedGeneration: 7
+  readyReplicas: 1
+  replicas: 1
+  unavailableReplicas: 0
+  updatedReplicas: 1
